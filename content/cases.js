@@ -39,10 +39,10 @@ window.YMIR_CASES = [
       { id: "case4_z56_surgery", title: "Surgery",
         src: "media/case4/z56-resection-180days.mp4", poster: "posters/case4-z56-resection-180days.jpg",
         width: 1280, height: 720 },
-      { id: "case4_z110_response", title: "Response",
+      { id: "case4_z110_response", title: "Responder",
         src: "media/case4/z110-response.mp4", poster: "posters/case4-z110-response.jpg",
         width: 1280, height: 720 },
-      { id: "case4_z44_nonresponse", title: "Non-response",
+      { id: "case4_z44_nonresponse", title: "Non-responder",
         src: "media/case4/z44-nonresponse.mp4", poster: "posters/case4-z44-nonresponse.jpg",
         width: 1280, height: 720 }
     ]
