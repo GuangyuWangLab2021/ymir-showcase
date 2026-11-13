@@ -2,11 +2,14 @@
 
 [Open Ymir](https://guangyuwanglab2021.github.io/ymir-showcase/).
 
-A static gallery of eight MP4 videos across four cases.
+A static gallery of eight demonstrations across four cases, with lightweight playback and optional original-resolution videos.
 
 - Edit `content/cases.js` to update titles and video paths.
 - Put MP4 files in `media/case1/` through `media/case4/`, with optional cover images in `posters/`.
 - Use H.264 / yuv420p with faststart for browser playback.
+- The HD button loads a higher-resolution source only after a click; click again to return to standard quality. Playback position and pause state are retained.
+- Case 1 uses an Original button because its source is 1120 × 600. Other high-quality copies retain their original 1920-pixel width. No upscaling is applied.
+- Seven high-quality files preserve the original videos exactly; the Non-responder video is re-encoded at its original 1920 × 1080 resolution to fit the repository file budget.
 - This repository and its GitHub Pages website are public, as requested by the owner.
 - GitHub Pages publishes the root of the `main` branch. No build dependencies are required.
 
