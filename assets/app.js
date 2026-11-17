@@ -50,15 +50,17 @@
   }
 
   for (const item of cases) {
-    const link = el("a", "case-link", "Case " + item.number);
-    link.href = "#" + item.id;
+    const link = el("a", "case-link", item.navLabel || item.title);
+    link.href = "#" + (item.slug || item.id);
     link.dataset.case = item.id;
     navigation.append(link);
   }
 
   function render() {
-    const current = cases.find(item => item.id === location.hash.slice(1).toLowerCase()) || cases[0];
+    const anchor = location.hash.slice(1).toLowerCase();
+    const current = cases.find(item => item.id === anchor || item.slug === anchor) || cases[0];
     if (!current) return;
+    if (current.slug && anchor !== current.slug) history.replaceState(null, "", "#" + current.slug);
     if (observer) observer.disconnect();
     visibleVideos.clear();
     for (const video of content.querySelectorAll("video")) {
@@ -68,19 +70,19 @@
       video.load();
     }
     content.replaceChildren();
-    document.title = "Ymir · " + (current.title || "Case " + current.number);
+    document.title = "Ymir · " + current.title;
     document.querySelectorAll(".case-link").forEach(link => {
       if (link.dataset.case === current.id) link.setAttribute("aria-current", "page");
       else link.removeAttribute("aria-current");
     });
     const view = el("div", "case-view " + current.id);
     view.dataset.case = current.id;
-    view.append(el("h1", current.title ? "case-title" : "sr-only", current.title || "Case " + current.number));
+    view.append(el("h1", "case-title", current.title));
 
-    current.videos.forEach((film, index) => {
+    const renderFilm = (film, index, target) => {
       const section = el("section", "video-section");
       section.dataset.video = film.id || "video-" + (index + 1);
-      if (film.title) section.append(el("h2", "video-heading", film.title));
+      if (film.title) section.append(el("h3", "video-heading", film.title));
       if (film.columns?.length) {
         const labels = el("div", "column-labels");
         film.columns.forEach(label => labels.append(el("span", "", label)));
@@ -96,7 +98,7 @@
       video.preload = index === 0 ? "metadata" : "none";
       video.autoplay = index === 0 && autoPlay;
       video.setAttribute("playsinline", "");
-      video.setAttribute("aria-label", film.title || film.columns?.join(" and ") || "Case " + current.number);
+      video.setAttribute("aria-label", film.title || film.columns?.join(" and ") || current.title);
       video.dataset.source = film.src;
       video.dataset.quality = "standard";
       if (film.width && film.height) {
@@ -198,18 +200,43 @@
         controls.append(status, button);
         section.append(controls);
       }
-      view.append(section);
+      target.append(section);
       if (current.id === "case1" && index === 0) {
         const slot = el("div", "between-panels");
         slot.dataset.slot = "case1-between-panels";
         if (current.betweenPanelsHtml) slot.innerHTML = current.betweenPanelsHtml;
-        view.append(slot);
+        target.append(slot);
       }
-    });
+    };
+
+    if (current.sections) {
+      current.sections.forEach(group => {
+        const supplement = el("section", "supplement-section");
+        supplement.dataset.supplement = group.id;
+        supplement.append(el("h2", "supplement-title", group.title));
+        const films = group.videoIds.map(id => current.videos.find(film => film.id === id)).filter(Boolean);
+        if (group.layout === "clinical") {
+          const grid = el("div", "clinical-grid");
+          for (const label of ["R", "NR"]) {
+            const column = el("div", "clinical-column");
+            column.append(el("h3", "clinical-heading", label === "R" ? "Responders" : "Non-responders"));
+            films.filter(film => film.clinicalGroup === label).forEach(film => renderFilm(film, current.videos.indexOf(film), column));
+            grid.append(column);
+          }
+          supplement.append(grid);
+        } else films.forEach(film => renderFilm(film, current.videos.indexOf(film), supplement));
+        if (group.captionHtml) {
+          const caption = el("p", "video-caption");
+          caption.innerHTML = group.captionHtml;
+          supplement.append(caption);
+        }
+        view.append(supplement);
+      });
+    } else current.videos.forEach((film, index) => renderFilm(film, index, view));
 
     if (!current.videos.length) {
       const empty = el("div", "empty-case");
-      empty.setAttribute("aria-label", "Case " + current.number + " videos pending");
+      empty.setAttribute("aria-label", current.title + " videos pending");
       empty.innerHTML = '<svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1" aria-hidden="true"><path d="M3 3h26v26H3zM13 10l9 6-9 6z"/></svg>';
       view.append(empty);
     }
