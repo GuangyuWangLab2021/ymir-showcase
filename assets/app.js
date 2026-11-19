@@ -23,11 +23,11 @@
     content.querySelectorAll(".cell-legend").forEach(legend => { legend.open = wideLegend.matches; });
   });
 
-  function cellLegend(cellTypes, sectionTitle) {
+  function cellLegend(cellTypes, topicTitle) {
     const legend = el("details", "cell-legend");
     legend.open = wideLegend.matches;
     const summary = el("summary", "", "Cell types");
-    summary.setAttribute("aria-label", sectionTitle + " cell types");
+    summary.setAttribute("aria-label", topicTitle + " cell types");
     const list = el("ul", "cell-legend-list");
     for (const [name, color] of cellTypes) {
       const item = el("li");
@@ -233,14 +233,17 @@
     };
 
     if (current.sections) {
+      let sections = view;
+      if (current.cellTypes) {
+        const layout = el("div", "with-cell-legend");
+        sections = el("div", "supplement-videos");
+        layout.append(sections, cellLegend(current.cellTypes, current.title));
+        view.append(layout);
+      }
       current.sections.forEach(group => {
         const supplement = el("section", "supplement-section");
         supplement.dataset.supplement = group.id;
         supplement.append(el("h2", "supplement-title", group.title));
-        if (current.cellTypes) {
-          supplement.classList.add("with-cell-legend");
-          supplement.append(cellLegend(current.cellTypes, group.title));
-        }
         const films = group.videoIds.map(id => current.videos.find(film => film.id === id)).filter(Boolean);
         if (group.layout === "clinical") {
           const grid = el("div", "clinical-grid");
@@ -257,7 +260,7 @@
           caption.innerHTML = group.captionHtml;
           supplement.append(caption);
         }
-        view.append(supplement);
+        sections.append(supplement);
       });
     } else current.videos.forEach((film, index) => renderFilm(film, index, view));
 
