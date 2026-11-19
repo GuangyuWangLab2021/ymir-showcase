@@ -18,6 +18,29 @@
     return node;
   };
 
+  const wideLegend = window.matchMedia("(min-width: 1120px)");
+  wideLegend.addEventListener("change", () => {
+    content.querySelectorAll(".cell-legend").forEach(legend => { legend.open = wideLegend.matches; });
+  });
+
+  function cellLegend(cellTypes, sectionTitle) {
+    const legend = el("details", "cell-legend");
+    legend.open = wideLegend.matches;
+    const summary = el("summary", "", "Cell types");
+    summary.setAttribute("aria-label", sectionTitle + " cell types");
+    const list = el("ul", "cell-legend-list");
+    for (const [name, color] of cellTypes) {
+      const item = el("li");
+      const swatch = el("span", "cell-swatch");
+      swatch.style.backgroundColor = color;
+      swatch.setAttribute("aria-hidden", "true");
+      item.append(swatch, name);
+      list.append(item);
+    }
+    legend.append(summary, list);
+    return legend;
+  }
+
   function pauseAutomatically(video) {
     if (!video.paused) {
       automaticPause.add(video);
@@ -214,6 +237,10 @@
         const supplement = el("section", "supplement-section");
         supplement.dataset.supplement = group.id;
         supplement.append(el("h2", "supplement-title", group.title));
+        if (current.cellTypes) {
+          supplement.classList.add("with-cell-legend");
+          supplement.append(cellLegend(current.cellTypes, group.title));
+        }
         const films = group.videoIds.map(id => current.videos.find(film => film.id === id)).filter(Boolean);
         if (group.layout === "clinical") {
           const grid = el("div", "clinical-grid");

@@ -125,6 +125,21 @@ window.YMIR_CASES = [
   },
   {
     "id": "case4",
+    // Base colors in the patient movie renderer's CELL_TYPES palette.
+    "cellTypes": [
+      ["Tumor (lepidic)", "#bc80bd"],
+      ["Tumor (invasive)", "#d62728"],
+      ["Fibroblast", "#008a92"],
+      ["CAF", "#02639a"],
+      ["Macrophage M0", "#c49c94"],
+      ["Macrophage M1", "#8c6d31"],
+      ["Macrophage M2", "#8c564b"],
+      ["CD8 T", "#b3de69"],
+      ["CD4 T", "#2ca02c"],
+      ["Treg", "#bcbd22"],
+      ["Endothelial", "#fb8072"],
+      ["Alveolar epithelium", "#bebada"]
+    ],
     "number": 4,
     "navLabel": "Patient-specific treatment simulation",
     "title": "Patient-specific treatment simulation",
